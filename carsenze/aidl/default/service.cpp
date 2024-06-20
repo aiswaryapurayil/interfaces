@@ -1,5 +1,5 @@
 
-#define LOG_TAG "Carsenze"
+#define LOG_TAG "Carsenze_hal"
 
 #include <android-base/logging.h>
 #include <android/binder_manager.h>
@@ -23,15 +23,15 @@ void loge(std::string msg) {
 
 int main() {
     // Enable vndbinder to allow vendor-to-venfor binder call
-    android::ProcessState::initWithDriver("/dev/vndbinder");
+    //android::ProcessState::initWithDriver("/dev/vndbinder");
 
     ABinderProcess_setThreadPoolMaxThreadCount(0);
-    ABinderProcess_startThreadPool();
+    //ABinderProcess_startThreadPool();
 
     std::shared_ptr<Carsenze> carsenze = ndk::SharedRefBase::make<Carsenze>();
-    const std::string name = Carsenze::descriptor + "/default"s;
+    const std::string name = std::string() + Carsenze::descriptor + "/default";
 
-    if (carsenze != nullptr) {
+    /*if (carsenze != nullptr) {
         if(AServiceManager_addService(carsenze->asBinder().get(), name.c_str()) != STATUS_OK) {
             loge("Failed to register ICarsense service");
             return -1;
@@ -39,7 +39,10 @@ int main() {
     } else {
         loge("Failed to get ICarsenze instance");
         return -1;
-    }
+    }*/
+
+    binder_status_t status = AServiceManager_addService(carsenze->asBinder().get(), name.c_str());
+    CHECK_EQ(status, STATUS_OK);
 
     logd("ICarsenze service starts to join service pool");
     ABinderProcess_joinThreadPool();
